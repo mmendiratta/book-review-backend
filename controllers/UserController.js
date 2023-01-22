@@ -12,6 +12,7 @@ exports.signupUser = (req, res) => {
         const user = new User({
           email: req.body.email,
           password: hash,
+          roles: []
         });
         user
           .save()
@@ -51,6 +52,7 @@ exports.loginUser = (req, res) => {
           res.status(200).json({
             userId: user._id,
             token: token,
+            roles: user.roles
           });
         })
         .catch(() => {
