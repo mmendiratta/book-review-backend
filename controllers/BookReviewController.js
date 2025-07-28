@@ -68,7 +68,7 @@ exports.updateBookreview = (req, res) => {
     title: reviewBody.title,
     review: reviewBody.review,
     rating: reviewBody.rating,
-    bookCoverUrl: reviewBody.bookCoverUrl
+    url: reviewBody.url
   });
   BookReview.updateOne({ _id: req.params.id }, updatedReview)
     .then(() => {
