@@ -5,7 +5,9 @@ const bookReviewModelSchema = mongoose.Schema({
   title: { type: String, require: true },
   review: { type: String, require: true },
   rating: { type: Number, require: true },
-  url: { type: String, require: true },
+  url: { type: String },
+  genre: { type: String },
+  isbn: { type: String },
 });
 
 module.exports = mongoose.model("Book Review", bookReviewModelSchema);

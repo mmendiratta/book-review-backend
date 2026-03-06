@@ -26,12 +26,18 @@ exports.getReviewById = (req, res) => {
 
 exports.createBookReview = (req, res) => {
   const reviewBody = req.body;
+  const coverUrl = reviewBody.isbn
+    ? `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`
+    : reviewBody.url || '';
+
   const bookReview = new BookReview({
     author: reviewBody.author,
     title: reviewBody.title,
     review: reviewBody.review,
     rating: reviewBody.rating,
-    url: reviewBody.url
+    url: coverUrl,
+    genre: reviewBody.genre,
+    isbn: reviewBody.isbn
   });
 
   bookReview
@@ -62,13 +68,19 @@ exports.deleteBookReview = (req, res) => {
 
 exports.updateBookreview = (req, res) => {
   const reviewBody = req.body;
+  const coverUrl = reviewBody.isbn
+    ? `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`
+    : reviewBody.url || '';
+
   updatedReview = new BookReview({
     _id: req.params.id,
     author: reviewBody.author,
     title: reviewBody.title,
     review: reviewBody.review,
     rating: reviewBody.rating,
-    bookCoverUrl: reviewBody.bookCoverUrl
+    url: coverUrl,
+    genre: reviewBody.genre,
+    isbn: reviewBody.isbn
   });
   BookReview.updateOne({ _id: req.params.id }, updatedReview)
     .then(() => {
