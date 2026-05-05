@@ -69,29 +69,42 @@ exports.deleteBookReview = (req, res) => {
   });
 };
 
-exports.updateBookreview = (req, res) => {
-  const reviewBody = req.body;
-  const coverUrl = req.file
-    ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    : reviewBody.isbn
-    ? `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`
-    : reviewBody.url || '';
+exports.updateBookreview = async (req, res) => {
+  try {
+    const reviewBody = req.body;
 
-  updatedReview = new BookReview({
-    _id: req.params.id,
-    author: reviewBody.author,
-    title: reviewBody.title,
-    review: reviewBody.review,
-    rating: reviewBody.rating,
-    url: coverUrl,
-    genre: reviewBody.genre,
-    isbn: reviewBody.isbn
-  });
-  BookReview.updateOne({ _id: req.params.id }, updatedReview)
-    .then(() => {
-      res.status(200).json({ message: "Updated Review!" });
-    })
-    .catch((error) => {
-      res.status(400).json({ error: error });
-    });
+    // Get existing book to preserve URL if not updating
+    const existingBook = await BookReview.findById(req.params.id);
+    if (!existingBook) {
+      return res.status(404).json({ error: "Book not found" });
+    }
+
+    // Determine cover URL with proper fallback
+    let coverUrl;
+    if (req.file) {
+      // New image uploaded
+      coverUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+    } else if (reviewBody.isbn) {
+      // ISBN provided, use Open Library
+      coverUrl = `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`;
+    } else {
+      // Preserve existing URL
+      coverUrl = existingBook.url;
+    }
+
+    const updatedReview = {
+      author: reviewBody.author,
+      title: reviewBody.title,
+      review: reviewBody.review,
+      rating: reviewBody.rating,
+      url: coverUrl,
+      genre: reviewBody.genre,
+      isbn: reviewBody.isbn
+    };
+
+    await BookReview.updateOne({ _id: req.params.id }, updatedReview);
+    res.status(200).json({ message: "Updated Review!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
