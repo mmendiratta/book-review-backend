@@ -2,6 +2,7 @@ const BookReview = require("../models/BookReviewModel");
 
 exports.getAllReviews = (req, res) => {
   BookReview.find()
+    .sort({ _id: -1 })
     .then((reviews) => {
       res.status(200).json(reviews);
     })
@@ -26,7 +27,9 @@ exports.getReviewById = (req, res) => {
 
 exports.createBookReview = (req, res) => {
   const reviewBody = req.body;
-  const coverUrl = reviewBody.isbn
+  const coverUrl = req.file
+    ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    : reviewBody.isbn
     ? `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`
     : reviewBody.url || '';
 
@@ -68,7 +71,9 @@ exports.deleteBookReview = (req, res) => {
 
 exports.updateBookreview = (req, res) => {
   const reviewBody = req.body;
-  const coverUrl = reviewBody.isbn
+  const coverUrl = req.file
+    ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    : reviewBody.isbn
     ? `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`
     : reviewBody.url || '';
 
