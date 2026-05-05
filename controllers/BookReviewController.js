@@ -72,6 +72,8 @@ exports.deleteBookReview = (req, res) => {
 exports.updateBookreview = async (req, res) => {
   try {
     const reviewBody = req.body;
+    console.log('Update request body:', reviewBody);
+    console.log('Update request file:', req.file);
 
     // Get existing book to preserve URL if not updating
     const existingBook = await BookReview.findById(req.params.id);
@@ -84,12 +86,15 @@ exports.updateBookreview = async (req, res) => {
     if (req.file) {
       // New image uploaded
       coverUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      console.log('Using uploaded image:', coverUrl);
     } else if (reviewBody.isbn) {
       // ISBN provided, use Open Library
       coverUrl = `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`;
+      console.log('Using ISBN cover:', coverUrl);
     } else {
       // Preserve existing URL
       coverUrl = existingBook.url;
+      console.log('Preserving existing URL:', coverUrl);
     }
 
     const updatedReview = {
@@ -98,13 +103,15 @@ exports.updateBookreview = async (req, res) => {
       review: reviewBody.review,
       rating: reviewBody.rating,
       url: coverUrl,
-      genre: reviewBody.genre,
-      isbn: reviewBody.isbn
+      genre: reviewBody.genre || existingBook.genre,
+      isbn: reviewBody.isbn || existingBook.isbn
     };
 
     await BookReview.updateOne({ _id: req.params.id }, updatedReview);
+    console.log('Successfully updated book:', req.params.id);
     res.status(200).json({ message: "Updated Review!" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Update error:', error);
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 };
