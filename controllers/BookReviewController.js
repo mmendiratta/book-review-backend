@@ -83,16 +83,15 @@ exports.updateBookreview = async (req, res) => {
 
     // Determine cover URL with proper fallback
     let coverUrl;
+    const existingUrlIsIsbn = existingBook.url?.includes('covers.openlibrary.org');
     if (req.file) {
-      // New image uploaded
       coverUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
       console.log('Using uploaded image:', coverUrl);
-    } else if (reviewBody.isbn) {
-      // ISBN provided, use Open Library
+    } else if (reviewBody.isbn && (!existingBook.url || existingUrlIsIsbn)) {
+      // Only use ISBN URL if no uploaded image is already set
       coverUrl = `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`;
       console.log('Using ISBN cover:', coverUrl);
     } else {
-      // Preserve existing URL
       coverUrl = existingBook.url;
       console.log('Preserving existing URL:', coverUrl);
     }
