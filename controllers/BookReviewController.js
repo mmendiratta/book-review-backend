@@ -29,9 +29,11 @@ exports.createBookReview = (req, res) => {
   const reviewBody = req.body;
   const coverUrl = req.file
     ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    : reviewBody.url
+    ? reviewBody.url
     : reviewBody.isbn
     ? `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`
-    : reviewBody.url || '';
+    : '';
 
   const bookReview = new BookReview({
     author: reviewBody.author,
@@ -87,6 +89,10 @@ exports.updateBookreview = async (req, res) => {
     if (req.file) {
       coverUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
       console.log('Using uploaded image:', coverUrl);
+    } else if (reviewBody.url) {
+      // Explicit new cover URL (e.g. a fresh Thumbsnap upload from the frontend)
+      coverUrl = reviewBody.url;
+      console.log('Using provided URL:', coverUrl);
     } else if (reviewBody.isbn && (!existingBook.url || existingUrlIsIsbn)) {
       // Only use ISBN URL if no uploaded image is already set
       coverUrl = `https://covers.openlibrary.org/b/isbn/${reviewBody.isbn}-L.jpg`;
