@@ -9,12 +9,14 @@ const path = require("path");
 
 const app = express();
 
+const dbName = process.env.MONGO_DB_NAME ? `/${process.env.MONGO_DB_NAME}` : "";
+
 mongoose
   .connect(
-    `mongodb+srv://book-review-user:${process.env.PASSWORD}@book-review-cluster1.xm8potp.mongodb.net/?retryWrites=true&w=majority`
+    `mongodb+srv://book-review-user:${process.env.PASSWORD}@book-review-cluster1.xm8potp.mongodb.net${dbName}?retryWrites=true&w=majority`
   )
   .then(() => {
-    console.log("connected to mongodb atlas");
+    console.log(`connected to mongodb atlas${dbName ? ` (db: ${process.env.MONGO_DB_NAME})` : ""}`);
   })
   .catch((error) => {
     console.log("unable to connect to mondodb");

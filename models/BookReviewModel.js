@@ -8,6 +8,7 @@ const bookReviewModelSchema = mongoose.Schema({
   url: { type: String },
   genre: { type: String },
   isbn: { type: String },
+  rank: { type: Number },
 });
 
 module.exports = mongoose.model("Book Review", bookReviewModelSchema);

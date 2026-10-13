@@ -7,10 +7,12 @@ const auth = require("../middleware/auth");
 const multer = require("../middleware/multer-config");
 
 router.get("/", bookReviewController.getAllReviews);
+router.get("/ranked", bookReviewController.getRankedReviews);
 router.get("/:id", bookReviewController.getReviewById);
 
 router.post("/", multer, bookReviewController.createBookReview);
 
+router.put("/:id/rank", bookReviewController.setReviewRank);
 router.put("/:id", multer, bookReviewController.updateBookreview);
 router.delete("/:id", bookReviewController.deleteBookReview);
 
